@@ -1,4 +1,4 @@
-package com.mobisigma.pizzabeer
+package com.mobisigma.pizzabeer.ui.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
