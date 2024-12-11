@@ -1,4 +1,3 @@
 package com.mobisigma.pizzabeer.domain.model
 
-class BusinessEntity {
-}
+data class BusinessEntity(val id: String)
