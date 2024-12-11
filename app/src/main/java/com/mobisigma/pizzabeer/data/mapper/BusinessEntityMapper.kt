@@ -9,4 +9,10 @@ fun BusinessEntitiesResponse.toBusinessEntities(): List<BusinessEntity> {
 }
 
 fun BusinessEntityDto.toBusinessEntity(): BusinessEntity =
-    BusinessEntity(id = this.id)
+    BusinessEntity(
+        id = this.id,
+        name = this.name,
+        rating = this.rating,
+        imageUrl = this.imageUrl,
+        reviewCount = this.reviewCount
+    )

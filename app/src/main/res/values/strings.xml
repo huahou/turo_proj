@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Pizza&amp;Beer</string>
+    <string name="business_detail">Business Details</string>
+    <string name="no_result_found">No nearby business found!</string>
+    <string name="search_placeholder_text">Type address or zip code to search</string>
+    <string name="error_loading">Error occurred! Please try again later</string>
+
+
 </resources>
