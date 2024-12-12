@@ -13,7 +13,7 @@ class BusinessListScreenTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun photoDetailScreen_titleDisplayed() {
+    fun businessListScreen_titleDisplayed() {
         composeTestRule.setContent {
             BusinessRowUI(
                 index = 0,
