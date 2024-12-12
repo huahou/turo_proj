@@ -7,25 +7,27 @@ import androidx.lifecycle.viewModelScope
 import com.mobisigma.pizzabeer.domain.model.Location
 import com.mobisigma.pizzabeer.domain.usecase.SearchBusinessUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchBusinessViewModel @Inject constructor(private val searchBusinessUseCase: SearchBusinessUseCase): ViewModel() {
-    private val _searchResult: MutableLiveData<SearchBusinessUseCase.SearchUiState> = MutableLiveData()
-    val searchResult: LiveData<SearchBusinessUseCase.SearchUiState> = _searchResult
+    private val _searchResult: MutableStateFlow<SearchBusinessUseCase.SearchUiState> = MutableStateFlow(SearchBusinessUseCase.SearchUiState.InitState)
+    val searchResult: StateFlow<SearchBusinessUseCase.SearchUiState> = _searchResult
 
-    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     fun search(location: Location) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
                 val resultState = searchBusinessUseCase.searchPizzaAndBeer(location)
-                _searchResult.postValue(resultState)
+                _searchResult.value = resultState
             }catch (t: Throwable) {
-                _searchResult.postValue(SearchBusinessUseCase.SearchUiState.Failure)
+                _searchResult.value = SearchBusinessUseCase.SearchUiState.Failure
             }finally {
                 _isLoading.value = false
             }
@@ -37,9 +39,9 @@ class SearchBusinessViewModel @Inject constructor(private val searchBusinessUseC
         viewModelScope.launch {
             try {
                 val resultState = searchBusinessUseCase.searchMore()
-                _searchResult.postValue(resultState)
+                _searchResult.value = resultState
             }catch (t: Throwable) {
-                _searchResult.postValue(SearchBusinessUseCase.SearchUiState.Failure)
+                _searchResult.value = SearchBusinessUseCase.SearchUiState.Failure
             }finally {
                 _isLoading.value = false
             }

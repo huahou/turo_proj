@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -43,8 +44,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun MainApp(viewModel: SearchBusinessViewModel) {
-    val searchResultState = viewModel.searchResult.observeAsState()
-    val loadingState = viewModel.isLoading.observeAsState()
+    val searchResultState = viewModel.searchResult.collectAsState()
+    val loadingState = viewModel.isLoading.collectAsState()
 
     PizzaBeerTheme {
         val navController: NavHostController = rememberNavController()
@@ -69,7 +70,7 @@ private fun MainApp(viewModel: SearchBusinessViewModel) {
                 composable(route = BusinessList.route) {
                     BusinessListScreen(
                         searchState = searchResultState.value,
-                        isLoading = loadingState.value!!,
+                        isLoading = loadingState.value,
                         onSearch = { location ->
                             viewModel.search(location)
                         },

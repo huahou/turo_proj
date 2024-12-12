@@ -54,7 +54,7 @@ import com.mobisigma.pizzabeer.ui.view.components.SearchField
 
 @Composable
 fun BusinessListScreen(
-    searchState: SearchBusinessUseCase.SearchUiState?,
+    searchState: SearchBusinessUseCase.SearchUiState,
     isLoading: Boolean,
     onSearch: (Location) -> Unit,
     onBusinessClick: (Int) -> Unit = {},
@@ -71,6 +71,10 @@ fun BusinessListScreen(
             )
         }
         when (searchState) {
+            is SearchBusinessUseCase.SearchUiState.InitState -> {
+                InitialUI()
+            }
+
             is SearchBusinessUseCase.SearchUiState.Success -> {
                 BusinessEntitiesUI2(searchState.data, onBusinessClick, onLoadMore)
             }
@@ -79,9 +83,7 @@ fun BusinessListScreen(
                 ErrorUI()
             }
 
-            else -> {
-                InitialUI()
-            }
+            else -> {}
 
         }
     }

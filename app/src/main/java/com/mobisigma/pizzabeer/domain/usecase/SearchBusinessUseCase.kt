@@ -18,6 +18,7 @@ class SearchBusinessUseCase(private val businessRepository: BusinessRepository) 
     sealed class SearchUiState {
         class Success(val data: List<BusinessEntity>) : SearchUiState()
         data object Failure: SearchUiState()
+        data object InitState: SearchUiState()
     }
 
     suspend fun searchPizzaAndBeer(location: Location): SearchUiState {
