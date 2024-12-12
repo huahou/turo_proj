@@ -253,6 +253,7 @@ fun BusinessCellUI(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
+                        //TODO: Remove hard-code
                         painter = painterResource(id = R.drawable.five_star),
                         contentDescription = "rating",
                         modifier = Modifier.height(16.dp)
