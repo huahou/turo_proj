@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,12 +23,14 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideEffect
 import androidx.compose.ui.layout.ContentScale
@@ -186,10 +190,14 @@ private fun BusinessEntitiesUI2(
             }
         }
 
-        if (isScrollToEnd /*&& !state.loadingMore*/) {
+        if (isScrollToEnd) {
             onLoadMore()
         }
-        LazyColumn(state = listState) {
+        LazyColumn(
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(8.dp)
+        ) {
             items(businessEntities.size) {
                 BusinessCellUI(index = it, businessEntity = businessEntities[it], onBusinessClick)
             }
@@ -203,54 +211,63 @@ fun BusinessCellUI(
     businessEntity: BusinessEntity,
     onBusinessClick: (Int) -> Unit
 ){
-    Box(
-        contentAlignment = Alignment.BottomStart
+    Surface(
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(businessEntity.imageUrl)
-                .crossfade(true)
-                .build(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    onBusinessClick.invoke(index)
-                }
-        )
-        Column (
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black.copy(alpha = 0.7f))
-                .padding(6.dp)
+        Box(
+            contentAlignment = Alignment.BottomStart,
         ) {
-            Text(
-                text = businessEntity.name,
-                style = typography.titleSmall,
-                color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Row(
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(businessEntity.imageUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.placeholder),
                 modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clickable {
+                        onBusinessClick.invoke(index)
+                    }
+            )
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.7f))
+                    .padding(6.dp)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.five_star),
-                    contentDescription = "rating",
-                    modifier = Modifier.height(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "${businessEntity.reviewCount}",
-                    style = typography.bodySmall,
-                    color = Color.White
+                    text = businessEntity.name,
+                    style = typography.titleSmall,
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.five_star),
+                        contentDescription = "rating",
+                        modifier = Modifier.height(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(id = R.string.review_numbers, businessEntity.reviewCount),
+                        style = typography.bodySmall,
+                        color = Color.White
+                    )
+                }
             }
         }
     }
+
 }
 
 @Composable

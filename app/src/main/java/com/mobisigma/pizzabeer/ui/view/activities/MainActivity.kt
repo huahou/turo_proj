@@ -36,21 +36,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             viewModel = hiltViewModel<SearchBusinessViewModel>()
-            FlickrApp(viewModel = viewModel)
+            MainApp(viewModel = viewModel)
         }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ){
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }
 
 @Composable
-private fun FlickrApp(viewModel: SearchBusinessViewModel) {
+private fun MainApp(viewModel: SearchBusinessViewModel) {
     val searchResultState = viewModel.searchResult.observeAsState()
     val loadingState = viewModel.isLoading.observeAsState()
 
@@ -94,10 +86,10 @@ private fun FlickrApp(viewModel: SearchBusinessViewModel) {
                     route = BusinessDetail.route,
                     arguments = BusinessDetail.arguments
                 ) { navBackStackEntry ->
-                    val photoIndex = navBackStackEntry.arguments?.getInt(BusinessDetail.businessIndexArg)
-                    photoIndex?.let{
-                        val image = (searchResultState as SearchBusinessUseCase.SearchUiState.Success).data[photoIndex]
-                        BusinessDetailScreen()
+                    val businessIndex = navBackStackEntry.arguments?.getInt(BusinessDetail.businessIndexArg)
+                    businessIndex?.let{
+                        val businessEntity = (searchResultState.value as SearchBusinessUseCase.SearchUiState.Success).data[businessIndex]
+                        BusinessDetailScreen(businessEntity)
                     }
                 }
             }

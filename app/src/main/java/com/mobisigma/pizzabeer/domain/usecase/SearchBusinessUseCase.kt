@@ -39,7 +39,7 @@ class SearchBusinessUseCase(private val businessRepository: BusinessRepository) 
 
                 val allBusinesses = (pizzaBusinesses + beerBusinesses).distinctBy { it.id }
                 businessEntities.addAll(allBusinesses)
-                return@withContext SearchUiState.Success(data = businessEntities)
+                return@withContext SearchUiState.Success(data = businessEntities.toList())
             } catch (t: Throwable) {
                 return@withContext SearchUiState.Failure
             }
