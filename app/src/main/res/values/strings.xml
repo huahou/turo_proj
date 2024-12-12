@@ -4,6 +4,6 @@
     <string name="no_result_found">No nearby business found!</string>
     <string name="search_placeholder_text">Type address or zip code to search</string>
     <string name="error_loading">Error occurred! Please try again later</string>
-
+    <string name="current_location">Use Current Location</string>
 
 </resources>

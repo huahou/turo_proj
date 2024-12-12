@@ -3,17 +3,12 @@ package com.mobisigma.pizzabeer.ui.view.activities
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -44,11 +39,21 @@ class MainActivity : ComponentActivity() {
             FlickrApp(viewModel = viewModel)
         }
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
 }
 
 @Composable
 private fun FlickrApp(viewModel: SearchBusinessViewModel) {
-    val photosState = viewModel.searchResult.observeAsState()
+    val searchResultState = viewModel.searchResult.observeAsState()
+    val loadingState = viewModel.isLoading.observeAsState()
+
     PizzaBeerTheme {
         val navController: NavHostController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
@@ -71,10 +76,16 @@ private fun FlickrApp(viewModel: SearchBusinessViewModel) {
             ){
                 composable(route = BusinessList.route) {
                     BusinessListScreen(
-                        searchState = photosState.value,
-                        onSearch = { viewModel.search(it) },
+                        searchState = searchResultState.value,
+                        isLoading = loadingState.value!!,
+                        onSearch = { location ->
+                            viewModel.search(location)
+                        },
                         onBusinessClick = { index ->
                             navController.navigateSingleTopTo("${BusinessDetail.baseRoute}/${index}")
+                        },
+                        onLoadMore = {
+                            viewModel.searchMore()
                         }
                     )
                 }
@@ -85,7 +96,7 @@ private fun FlickrApp(viewModel: SearchBusinessViewModel) {
                 ) { navBackStackEntry ->
                     val photoIndex = navBackStackEntry.arguments?.getInt(BusinessDetail.businessIndexArg)
                     photoIndex?.let{
-                        val image = (photosState as SearchBusinessUseCase.SearchUiState.Success).data[photoIndex]
+                        val image = (searchResultState as SearchBusinessUseCase.SearchUiState.Success).data[photoIndex]
                         BusinessDetailScreen()
                     }
                 }

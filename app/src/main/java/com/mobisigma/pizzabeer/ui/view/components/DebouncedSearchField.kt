@@ -43,7 +43,7 @@ fun SearchField(
         },
         textStyle = MaterialTheme.typography.bodyMedium,
         placeholder = {
-            Text(text = stringResource(id = R.string.search_placeholder_text))
+            Text(text = searchPlaceholder)
         },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
         maxLines = 1,
