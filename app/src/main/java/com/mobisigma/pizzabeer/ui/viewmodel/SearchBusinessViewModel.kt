@@ -20,7 +20,7 @@ class SearchBusinessViewModel @Inject constructor(private val searchBusinessUseC
     private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun search(location: Location) {
+    fun search(location: Location? = null) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
@@ -33,19 +33,4 @@ class SearchBusinessViewModel @Inject constructor(private val searchBusinessUseC
             }
         }
     }
-
-    fun searchMore(){
-        _isLoading.value = true
-        viewModelScope.launch {
-            try {
-                val resultState = searchBusinessUseCase.searchMore()
-                _searchResult.value = resultState
-            }catch (t: Throwable) {
-                _searchResult.value = SearchBusinessUseCase.SearchUiState.Failure
-            }finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
 }

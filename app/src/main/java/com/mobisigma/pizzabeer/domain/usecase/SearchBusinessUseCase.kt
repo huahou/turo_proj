@@ -21,10 +21,11 @@ class SearchBusinessUseCase(private val businessRepository: BusinessRepository) 
         data object InitState: SearchUiState()
     }
 
-    suspend fun searchPizzaAndBeer(location: Location): SearchUiState {
-        this.location = location
-
-        businessEntities.clear()
+    suspend fun searchPizzaAndBeer(location: Location?): SearchUiState {
+        if (location != null) {
+            this.location = location
+            businessEntities.clear()
+        }
         return search()
     }
 
@@ -53,9 +54,5 @@ class SearchBusinessUseCase(private val businessRepository: BusinessRepository) 
                 }
             }
         }
-    }
-
-    suspend fun searchMore(): SearchUiState {
-        return search()
     }
 }
