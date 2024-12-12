@@ -1,5 +1,7 @@
 package com.mobisigma.pizzabeer.ui.view.components
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -23,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import com.mobisigma.pizzabeer.R
@@ -77,24 +80,25 @@ fun CurrentLocationField(onLocationObtained: (Double, Double ) -> Unit) {
 }
 
 private fun hasLocationPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        android.Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
+    return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
 }
 
+@SuppressLint("MissingPermission")
 private fun getCurrentLocation(context: Context, callback: (Double, Double) -> Unit) {
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    fusedLocationClient.lastLocation
-        .addOnSuccessListener { location ->
-            if (location != null) {
-                val lat = location.latitude
-                val long = location.longitude
-                callback(lat, long)
+    if (hasLocationPermission(context)) {
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    val lat = location.latitude
+                    val long = location.longitude
+                    callback(lat, long)
+                }
             }
-        }
-        .addOnFailureListener { exception ->
-            // Handle location retrieval failure
-            exception.printStackTrace()
-        }
+            .addOnFailureListener { exception ->
+                // Handle location retrieval failure
+                exception.printStackTrace()
+            }
+    }
 }
