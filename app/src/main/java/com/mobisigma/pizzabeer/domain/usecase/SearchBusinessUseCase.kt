@@ -5,7 +5,9 @@ import com.mobisigma.pizzabeer.domain.model.Location
 import com.mobisigma.pizzabeer.domain.repository.BusinessRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.cancellation.CancellationException
 
 class SearchBusinessUseCase(private val businessRepository: BusinessRepository) {
     private lateinit var location: Location
@@ -28,20 +30,26 @@ class SearchBusinessUseCase(private val businessRepository: BusinessRepository) 
     private suspend fun search(): SearchUiState {
         return withContext(Dispatchers.IO) {
             try {
-                val pizzaBusinessesDeferred = async { businessRepository.search("pizza", location, pizzaOffset) }
-                val beerBusinessesDeferred = async { businessRepository.search("beer", location, beerOffset) }
+                supervisorScope {
+                    val pizzaBusinessesDeferred = async { businessRepository.search("pizza", location, pizzaOffset) }
+                    val beerBusinessesDeferred = async { businessRepository.search("beer", location, beerOffset) }
 
-                val pizzaBusinesses = pizzaBusinessesDeferred.await()
-                val beerBusinesses = beerBusinessesDeferred.await()
+                    val pizzaBusinesses = pizzaBusinessesDeferred.await()
+                    val beerBusinesses = beerBusinessesDeferred.await()
 
-                pizzaOffset += pizzaBusinesses.size
-                beerOffset += beerBusinesses.size
+                    pizzaOffset += pizzaBusinesses.size
+                    beerOffset += beerBusinesses.size
 
-                val allBusinesses = (pizzaBusinesses + beerBusinesses).distinctBy { it.id }
-                businessEntities.addAll(allBusinesses)
-                return@withContext SearchUiState.Success(data = businessEntities.toList())
+                    val allBusinesses = (pizzaBusinesses + beerBusinesses).distinctBy { it.id }
+                    businessEntities.addAll(allBusinesses)
+                    SearchUiState.Success(data = businessEntities.toList())
+                }
             } catch (t: Throwable) {
-                return@withContext SearchUiState.Failure
+                if (t !is CancellationException) {
+                    return@withContext SearchUiState.Failure
+                } else {
+                    throw t
+                }
             }
         }
     }

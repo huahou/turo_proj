@@ -6,7 +6,7 @@ import com.mobisigma.pizzabeer.domain.model.BusinessEntity
 import com.mobisigma.pizzabeer.domain.model.Location
 import com.mobisigma.pizzabeer.domain.repository.BusinessRepository
 
-class BusinessRepositoryImpl constructor(private val remoteApi: YelpRemoteApi): BusinessRepository {
+class BusinessRepositoryImpl (private val remoteApi: YelpRemoteApi): BusinessRepository {
     override suspend fun search(keyword: String, location: Location, offset: Int): List<BusinessEntity> {
         //TODO: add database logic here
         val response = remoteApi.searchBusiness(keyword, location.address, location.latitude, location.longitude, offset)

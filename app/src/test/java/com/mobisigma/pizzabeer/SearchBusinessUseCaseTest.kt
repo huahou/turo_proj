@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import okhttp3.ResponseBody
 import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -23,6 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -91,5 +91,31 @@ class SearchBusinessUseCaseTest {
 
         Assert.assertTrue(searchResult is SearchBusinessUseCase.SearchUiState.Success)
         assertEquals(allBusinesses.size, (searchResult as SearchBusinessUseCase.SearchUiState.Success).data.size)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun searchBusinessUseCase_searchPizzaAndBeer_whenPizzaSearchFails() = runTest {
+        Mockito.`when`(repo.search("pizza", Location("92620"), 0)).thenThrow(RuntimeException("Pizza search failed"))
+        Mockito.`when`(repo.search("beer", Location("92620"), 0)).thenReturn(emptyList())
+
+        val errorResult = useCase.searchPizzaAndBeer(Location("92620"))
+
+        advanceUntilIdle()
+
+        Assert.assertTrue(errorResult is SearchBusinessUseCase.SearchUiState.Failure)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun searchBusinessUseCase_searchPizzaAndBeer_whenBeerSearchFails() = runTest {
+        Mockito.`when`(repo.search("pizza", Location("92620"), 0)).thenReturn(emptyList())
+        Mockito.`when`(repo.search("beer", Location("92620"), 0)).thenThrow(RuntimeException("Pizza search failed"))
+
+        val errorResult = useCase.searchPizzaAndBeer(Location("92620"))
+
+        advanceUntilIdle()
+
+        Assert.assertTrue(errorResult is SearchBusinessUseCase.SearchUiState.Failure)
     }
 }
